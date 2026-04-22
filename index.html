@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Training ROI Calculator | Violetta Drobot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body style="margin: 0; padding: 0; background-color: #0F172A;">
+    <div id="app"></div>
+
+    <script>
+        // Main Calculator App
+        const app = {
+            trainingCost: 5000,
+            employeeCount: 1,
+            averageSalary: 100000,
+            activities: [
+                { name: 'Email Triage', hours: 2 },
+                { name: 'Benefits Q&A', hours: 1 },
+                { name: 'Onboarding', hours: 0.5 }
+            ],
+            workDays: 250,
+
+            init() {
+                this.render();
+            },
+
+            render() {
+                const totalHours = this.activities.reduce((sum, a) => sum + (a.hours * this.workDays), 0);
+                const hourlyRate = this.averageSalary / 2080;
+                const totalBenefit = totalHours * hourlyRate;
+                const netBenefit = totalBenefit - this.trainingCost;
+                const roi = Math.round((netBenefit / this.trainingCost) * 100);
+                const monthlyBenefit = totalBenefit / 12;
+                const breakEvenDays = Math.round((this.trainingCost / monthlyBenefit) * 30);
+
+                const formatCurrency = (num) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(num);
+
+                const html = `
+                    <div style="background-color: #0F172A; min-height: 100vh; color: #F1F5F9;">
+                        <!-- Header -->
+                        <div style="border-bottom: 1px solid #1E293B; padding: 3rem 1.5rem; text-align: center;">
+                            <h1 style="font-size: 2rem; font-weight: bold; color: #06B6D4; margin: 0;">AI Training ROI Calculator</h1>
+                            <p style="color: #CBD5E1; margin-top: 0.5rem;">Calculate the financial impact of AI training on your HR team</p>
+                        </div>
+
+                        <!-- Main Content -->
+                        <div style="max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                                <!-- LEFT SIDE - INPUTS -->
+                                <div>
+                                    <!-- Training Cost -->
+                                    <div style="background-color: #1E293B; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
+                                        <h3 style="color: #F1F5F9; font-size: 1.125rem; font-weight: bold; margin-bottom: 1rem;">Training Investment</h3>
+                                        <label style="color: #CBD5E1; font-size: 0.875rem; display: block; margin-bottom: 0.5rem;">Training Cost ($)</label>
+                                        <input type="number" value="${this.trainingCost}" onchange="app.trainingCost = parseFloat(this.value); app.render();" style="width: 100%; padding: 0.75rem; border: 2px solid #0EA5E9; border-radius: 0.5rem; background-color: #0F172A; color: #F1F5F9; font-size: 1rem;"/>
+                                    </div>
+
+                                    <!-- Team Information -->
+                                    <div style="background-color: #1E293B; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
+                                        <h3 style="color: #F1F5F9; font-size: 1.125rem; font-weight: bold; margin-bottom: 1rem;">Team Information</h3>
+                                        
+                                        <label style="color: #CBD5E1; font-size: 0.875rem; display: block; margin-bottom: 0.5rem;">Number of Employees</label>
+                                        <input type="number" value="${this.employeeCount}" onchange="app.employeeCount = parseInt(this.value) || 1; app.render();" style="width: 100%; padding: 0.75rem; border: 2px solid #0EA5E9; border-radius: 0.5rem; background-color: #0F172A; color: #F1F5F9; font-size: 1rem; margin-bottom: 1rem;"/>
+
+                                        <label style="color: #CBD5E1; font-size: 0.875rem; display: block; margin-bottom: 0.5rem;">Average Annual Salary ($)</label>
+                                        <input type="number" value="${this.averageSalary}" onchange="app.averageSalary = parseFloat(this.value) || 0; app.render();" style="width: 100%; padding: 0.75rem; border: 2px solid #0EA5E9; border-radius: 0.5rem; background-color: #0F172A; color: #F1F5F9; font-size: 1rem;"/>
+                                    </div>
+
+                                    <!-- Activities -->
+                                    <div style="background-color: #1E293B; padding: 1.5rem; border-radius: 0.5rem;">
+                                        <h3 style="color: #F1F5F9; font-size: 1.125rem; font-weight: bold; margin-bottom: 1rem;">Hours Saved Per Activity</h3>
+                                        ${this.activities.map((activity, index) => `
+                                            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+                                                <input type="text" value="${activity.name}" onchange="app.activities[${index}].name = this.value; app.render();" style="flex: 1; padding: 0.5rem; border: 2px solid #0EA5E9; border-radius: 0.5rem; background-color: #0F172A; color: #F1F5F9; font-size: 0.875rem;"/>
+                                                <input type="number" value="${activity.hours}" step="0.5" onchange="app.activities[${index}].hours = parseFloat(this.value) || 0; app.render();" style="width: 80px; padding: 0.5rem; border: 2px solid #0EA5E9; border-radius: 0.5rem; background-color: #0F172A; color: #F1F5F9; font-size: 0.875rem;"/>
+                                                ${this.activities.length > 1 ? `<button onclick="app.activities.splice(${index}, 1); app.render();" style="padding: 0.5rem 0.75rem; background-color: #0C4F64; color: #FCD34D; border: none; border-radius: 0.5rem; cursor: pointer;">×</button>` : ''}
+                                            </div>
+                                        `).join('')}
+                                        <button onclick="app.activities.push({name: '', hours: 0}); app.render();" style="width: 100%; padding: 0.5rem; background-color: #0EA5E9; color: #F1F5F9; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 500; font-size: 0.875rem; margin-top: 0.75rem;">+ Add Activity</button>
+                                    </div>
+                                </div>
+
+                                <!-- RIGHT SIDE - RESULTS -->
+                                <div>
+                                    <!-- Metric Cards with Tooltips -->
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                                        <!-- Annual Benefit -->
+                                        <div style="background-color: #1E293B; padding: 1.5rem; border-radius: 0.5rem; border-left: 4px solid #0EA5E9; position: relative; cursor: help;" onmouseover="this.querySelector('.tooltip').style.opacity='1'; this.querySelector('.tooltip').style.pointerEvents='auto';" onmouseout="this.querySelector('.tooltip').style.opacity='0'; this.querySelector('.tooltip').style.pointerEvents='none';">
+                                            <p style="color: #CBD5E1; font-size: 0.875rem; margin: 0 0 0.5rem 0;">Annual Benefit</p>
+                                            <p style="color: #06B6D4; font-size: 1.5rem; font-weight: bold; margin: 0;">${formatCurrency(totalBenefit)}</p>
+                                            <div class="tooltip" style="position: absolute; bottom: 100%; left: 0; margin-bottom: 0.5rem; width: 280px; background-color: #0C4F64; border: 1px solid #06B6D4; border-radius: 0.5rem; padding: 1rem; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 10;">
+                                                <p style="color: #F1F5F9; font-size: 0.75rem; font-weight: 600; margin: 0 0 0.5rem 0;">Total Hours Saved × Hourly Rate</p>
+                                                <p style="color: #F1F5F9; font-size: 0.75rem; margin: 0.25rem 0;">Hours: ${totalHours.toLocaleString()} hrs/year</p>
+                                                <p style="color: #F1F5F9; font-size: 0.75rem; margin: 0.25rem 0;">Rate: $${hourlyRate.toFixed(2)}/hr</p>
+                                                <p style="color: #F1F5F9; font-size: 0.75rem; border-top: 1px solid #06B6D4; padding-top: 0.5rem; margin-top: 0.5rem; margin-bottom: 0;">${totalHours.toLocaleString()} × $${hourlyRate.toFixed(2)} = ${formatCurrency(totalBenefit)}</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- ROI -->
+                                        <div style="background-color: #1E293B; padding: 1.5rem; border-radius: 0.5rem; border-left: 4px solid #0EA5E9; position: relative; cursor: help;" onmouseover="this.querySelector('.tooltip').style.opacity='1'; this.querySelector('.tooltip').style.pointerEvents='auto';" onmouseout="this.querySelector('.tooltip').style.opacity='0'; this.querySelector('.tooltip').style.pointerEvents='none';">
+                                            <p style="color: #CBD5E1; font-size: 0.875rem; margin: 0 0 0.5rem 0;">ROI</p>
+                                            <p style="color: #FCD34D; font-size: 1.5rem; font-weight: bold; margin: 0;">${roi}%</p>
+                                            <div class="tooltip" style="position: absolute; bottom: 100%; right: 0; margin-bottom: 0.5rem; width: 280px; background-color: #0C4F64; border: 1px solid #06B6D4; border-radius: 0.5rem; padding: 1rem; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 10;">
+                                                <p style="color: #F1F5F9; font-size: 0.75rem; font-weight: 600; margin: 0 0 0.5rem 0;">(Benefit - Investment) / Investment × 100</p>
+                                                <p style="color: #F1F5F9; font-size: 0.75rem; margin: 0.25rem 0;">Benefit: ${formatCurrency(totalBenefit)}</p>
+                                                <p style="color: #F1F5F9; font-size: 0.75rem; margin: 0.25rem 0;">Investment: ${formatCurrency(this.trainingCost)}</p>
+                                                <p style="color: #F1F5F9; font-size: 0.75rem; border-top: 1px solid #06B6D4; padding-top: 0.5rem; margin-top: 0.5rem; margin-bottom: 0;">(${formatCurrency(totalBenefit)} - ${formatCurrency(this.trainingCost)}) / ${formatCurrency(this.trainingCost)} × 100 = ${roi}%</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Break-Even -->
+                                        <div style="background-color: #1E293B; padding: 1.5rem; border-radius: 0.5rem; border-left: 4px solid #0EA5E9; position: relative; cursor: help;" onmouseover="this.querySelector('.tooltip').style.opacity='1'; this.querySelector('.tooltip').style.pointerEvents='auto';" onmouseout="this.querySelector('.tooltip').style.opacity='0'; this.querySelector('.tooltip').style.pointerEvents='none';">
+                                            <p style="color: #CBD5E1; font-size: 0.875rem; margin: 0 0 0.5rem 0;">Break-Even</p>
+                                            <p style="color: #06B6D4; font-size: 1.5rem; font-weight: bold; margin: 0;">${breakEvenDays} days</p>
+                                            <div class="tooltip" style="position: absolute; bottom: 100%; left: 0; margin-bottom: 0.5rem; width: 280px; background-color: #0C4F64; border: 1px solid #06B6D4; border-radius: 0.5rem; padding: 1rem; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 10;">
+                                                <p style="color: #F1F5F9; font-size: 0.75rem; font-weight: 600; margin: 0 0 0.5rem 0;">Investment / Monthly Benefit × 30</p>
+                                                <p style="color: #F1F5F9; font-size: 0.75rem; margin: 0.25rem 0;">Investment: ${formatCurrency(this.trainingCost)}</p>
+                                                <p style="color: #F1F5F9; font-size: 0.75rem; margin: 0.25rem 0;">Monthly: ${formatCurrency(monthlyBenefit)}</p>
+                                                <p style="color: #F1F5F9; font-size: 0.75rem; border-top: 1px solid #06B6D4; padding-top: 0.5rem; margin-top: 0.5rem; margin-bottom: 0;">${formatCurrency(this.trainingCost)} / ${formatCurrency(monthlyBenefit)} × 30 = ${breakEvenDays} days</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Net Benefit -->
+                                        <div style="background-color: #1E293B; padding: 1.5rem; border-radius: 0.5rem; border-left: 4px solid #0EA5E9; position: relative; cursor: help;" onmouseover="this.querySelector('.tooltip').style.opacity='1'; this.querySelector('.tooltip').style.pointerEvents='auto';" onmouseout="this.querySelector('.tooltip').style.opacity='0'; this.querySelector('.tooltip').style.pointerEvents='none';">
+                                            <p style="color: #CBD5E1; font-size: 0.875rem; margin: 0 0 0.5rem 0;">Net Benefit (Y1)</p>
+                                            <p style="color: #FCD34D; font-size: 1.5rem; font-weight: bold; margin: 0;">${formatCurrency(netBenefit)}</p>
+                                            <div class="tooltip" style="position: absolute; bottom: 100%; right: 0; margin-bottom: 0.5rem; width: 280px; background-color: #0C4F64; border: 1px solid #06B6D4; border-radius: 0.5rem; padding: 1rem; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 10;">
+                                                <p style="color: #F1F5F9; font-size: 0.75rem; font-weight: 600; margin: 0 0 0.5rem 0;">Annual Benefit - Investment</p>
+                                                <p style="color: #F1F5F9; font-size: 0.75rem; margin: 0.25rem 0;">Benefit: ${formatCurrency(totalBenefit)}</p>
+                                                <p style="color: #F1F5F9; font-size: 0.75rem; margin: 0.25rem 0;">Investment: ${formatCurrency(this.trainingCost)}</p>
+                                                <p style="color: #F1F5F9; font-size: 0.75rem; border-top: 1px solid #06B6D4; padding-top: 0.5rem; margin-top: 0.5rem; margin-bottom: 0;">${formatCurrency(totalBenefit)} - ${formatCurrency(this.trainingCost)} = ${formatCurrency(netBenefit)}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Benefit Breakdown -->
+                                    <div style="background-color: #1E293B; padding: 1.5rem; border-radius: 0.5rem; border-left: 4px solid #06B6D4;">
+                                        <h3 style="color: #F1F5F9; font-size: 1rem; font-weight: bold; margin-bottom: 1rem;">Benefit Breakdown</h3>
+                                        <div style="color: #CBD5E1; font-size: 0.875rem;">
+                                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                                                <span>Hours Saved Per Year</span>
+                                                <span style="color: #06B6D4; font-weight: 600;">${totalHours.toLocaleString()} hrs</span>
+                                            </div>
+                                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                                                <span>Average Hourly Rate</span>
+                                                <span style="color: #06B6D4; font-weight: 600;">$${hourlyRate.toFixed(2)}/hr</span>
+                                            </div>
+                                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                                                <span>Monthly Benefit</span>
+                                                <span style="color: #06B6D4; font-weight: 600;">${formatCurrency(monthlyBenefit)}</span>
+                                            </div>
+                                            <div style="border-top: 1px solid #0C4F64; padding-top: 0.75rem; margin-top: 0.75rem; display: flex; justify-content: space-between;">
+                                                <span style="color: #F1F5F9; font-weight: 600;">Total Annual Benefit</span>
+                                                <span style="color: #FCD34D; font-size: 1.125rem; font-weight: bold;">${formatCurrency(totalBenefit)}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div style="border-top: 1px solid #1E293B; padding: 2rem 1.5rem; text-align: center; color: #CBD5E1; font-size: 0.875rem; margin-top: 4rem;">
+                            <p style="margin: 0;">Calculator based on Wayne Cascio's Investing in People Framework</p>
+                            <p style="margin: 0.5rem 0 0 0; font-size: 0.75rem;">© Violetta Drobot - AI Compliance Consultant</p>
+                            <div style="margin-top: 1rem;">
+                                <a href="https://www.linkedin.com/in/violetta-drobot" target="_blank" style="color: #06B6D4; text-decoration: none; margin: 0 1rem;">LinkedIn</a>
+                                <a href="mailto:violettadrobot@gmail.com" style="color: #06B6D4; text-decoration: none; margin: 0 1rem;">Email</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('app').innerHTML = html;
+            }
+        };
+
+        // Initialize app
+        app.init();
+    </script>
+</body>
+</html>
