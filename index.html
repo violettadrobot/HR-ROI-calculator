@@ -116,7 +116,7 @@
                         </div>
 
                         <div class="max-w-7xl mx-auto px-6 py-8">
-                            ${this.activeTab === 'overview' ? this.renderCalculator(totalBenefit, netBenefit, roi, monthlyBenefit, totalHoursSaved, averageHourlyRate, costPerHour) : this.renderBreakEven(trainingCost, monthlyBenefit, breakEvenDays, breakEvenMonths, netBenefit)}
+                            ${this.activeTab === 'overview' ? this.renderCalculator(totalBenefit, netBenefit, roi, monthlyBenefit, totalHoursSaved, averageHourlyRate, costPerHour) : this.renderBreakEven(this.trainingCost, monthlyBenefit, breakEvenDays, breakEvenMonths, netBenefit)}
                         </div>
 
                         <!-- Footer -->
@@ -130,7 +130,7 @@
                                     <div class="text-right">
                                         <p class="text-sm font-semibold mb-3" style="color: #FCD34D;">Designed by Violetta Drobot</p>
                                         <div class="flex gap-4 justify-end">
-                                            <a href="https://www.linkedin.com/in/violetta-drobot-ms-in-hrm-and-pm-shrm-scp/" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 hover:opacity-80 transition" style="color: #06B6D4;">
+                                            <a href="https://www.linkedin.com/in/violetta-drobot" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 hover:opacity-80 transition" style="color: #06B6D4;">
                                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.474-2.237-1.668-2.237-.909 0-1.451.613-1.688 1.213-.087.211-.109.505-.109.799v5.794h-3.557s.047-9.411 0-10.381h3.557v1.468c.459-.707 1.282-1.714 3.119-1.714 2.278 0 3.986 1.489 3.986 4.691v5.936zM5.337 8.855c-1.144 0-1.915-.758-1.915-1.706 0-.956.766-1.71 1.955-1.71 1.188 0 1.913.754 1.937 1.71 0 .948-.749 1.706-1.977 1.706zm1.946 11.597H3.392V9.071h3.891v11.381zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg>
                                                 <span class="text-sm">LinkedIn</span>
                                             </a>
